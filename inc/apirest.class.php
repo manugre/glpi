@@ -487,6 +487,7 @@ class APIRest extends API {
       }
 
       // try to retrieve user_token in header
+	  // a completer
       if (isset($headers['Authorization'])
           && (strpos($headers['Authorization'], 'user_token') !== false)) {
          $auth = explode(' ', $headers['Authorization']);
