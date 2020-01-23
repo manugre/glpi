@@ -43,7 +43,8 @@ define ('NS_PLUG', 'GlpiPlugin\\');
  * @return boolean
  */
 function isCommandLine() {
-       return (!isset($_SERVER['SERVER_SOFTWARE']) && (php_sapi_name() == 'cli' || (is_numeric($_SERVER['argc']) && $_SERVER['argc'] > 0)));
+   //return (PHP_SAPI == 'cli');
+    return (!isset($_SERVER['SERVER_SOFTWARE']) && (php_sapi_name() == 'cli' || (is_numeric($_SERVER['argc']) && $_SERVER['argc'] > 0)));
 }
 
 /**
@@ -52,13 +53,13 @@ function isCommandLine() {
  * @return boolean
  */
 function isAPI() {
-   if (!isset($_SERVER["SCRIPT_FILENAME"]) || empty($_SERVER["SCRIPT_FILENAME"])) {
+	if (!isset($_SERVER["SCRIPT_FILENAME"]) || empty($_SERVER["SCRIPT_FILENAME"])) {
       return false;
-   }
-   if (strpos($_SERVER["SCRIPT_FILENAME"], 'apirest.php') !== false) {
+    }
+   if (strpos($_SERVER['SCRIPT_FILENAME'], 'apirest.php') !== false) {
       return true;
    }
-   if (strpos($_SERVER["SCRIPT_FILENAME"], 'apixmlrpc.php') !== false) {
+   if (strpos($_SERVER['SCRIPT_FILENAME'], 'apixmlrpc.php') !== false) {
       return true;
    }
    return false;

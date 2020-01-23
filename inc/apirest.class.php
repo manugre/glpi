@@ -240,18 +240,14 @@ class APIRest extends API {
                   $range = [0, $_SESSION['glpilist_limit']];
                   if (isset($this->parameters['range'])) {
                      $range = explode("-", $this->parameters['range']);
+                     // fix end range
+                     if ($range[1] > $totalcount - 1) {
+                        $range[1] = $totalcount - 1;
+                     }
+                     if ($range[1] - $range[0] + 1 < $totalcount) {
+                         $code = 206; // partial content
+                     }
                   }
-
-                  // fix end range
-                  if ($range[1] > $totalcount - 1) {
-                     $range[1] = $totalcount - 1;
-                  }
-
-                  // trigger partial content return code
-                  if ($range[1] - $range[0] + 1 < $totalcount) {
-                        $code = 206; // partial content
-                  }
-
                   $additionalheaders["Accept-Range"]  = $itemtype." ".Toolbox::get_max_input_vars();
                   if ($totalcount > 0) {
                      $additionalheaders["Content-Range"] = implode('-', $range)."/".$totalcount;
@@ -485,14 +481,24 @@ class APIRest extends API {
          $parameters['login']    = $_SERVER['PHP_AUTH_USER'];
          $parameters['password'] = $_SERVER['PHP_AUTH_PW'];
       }
+//echo 'Headers : '; var_dump($headers); echo "\n";
 
       // try to retrieve user_token in header
-	  // a completer
       if (isset($headers['Authorization'])
           && (strpos($headers['Authorization'], 'user_token') !== false)) {
          $auth = explode(' ', $headers['Authorization']);
          if (isset($auth[1])) {
             $parameters['user_token'] = $auth[1];
+         }
+      }
+	 
+	 // try to retrieve basic  token in header
+      if (isset($headers['Authorization'])
+          && (strpos($headers['Authorization'], 'Basic') !== false)) {
+         $auth = explode(' ', $headers['Authorization']);
+         if (isset($auth[1]) &&(isset($auth[2]) )) {
+            $parameters['login'] = $auth[1];
+			$parameters['password'] = $auth[2];
          }
       }
 

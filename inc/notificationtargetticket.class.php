@@ -162,16 +162,24 @@ class NotificationTargetTicket extends NotificationTargetCommonITILObject {
 
    function getDataForObject(CommonDBTM $item, array $options, $simple = false) {
       global $CFG_GLPI;
-
+// -user api token
+foreach ($item->getUsers(CommonITILActor::REQUESTER) as $tmpusr) {
+ $user_tmp = new User();
+ $uid= $user_tmp->getFromDB($tmpusr['users_id']);
+}
+//
       // Common ITIL data
       $data = parent::getDataForObject($item, $options, $simple);
       /*$data['##ticket.description##'] = Html::clean($data['##ticket.description##']);*/
 
       $data['##ticket.content##'] = $data['##ticket.description##'];
       // Specific data
-      $data['##ticket.urlvalidation##']
-                        = $this->formatURL($options['additionnaloption']['usertype'],
-                                          "ticket_".$item->getField("id")."_TicketValidation$1");
+     // $data['##ticket.urlvalidation##']
+     //                   = $this->formatURL($options['additionnaloption']['usertype'],
+      //                                    "ticket_".$item->getField("id")."_TicketValidation$1");
+	  $data['##ticket.urlvalidation##']     =urldecode("https://clients.pilote.immo/view/ticket/" . $item->getField("id") . "/u/".$user_tmp->getField('api_token') ."/");
+	  
+
       $data['##ticket.globalvalidation##']
                         = TicketValidation::getStatus($item->getField('global_validation'));
       $data['##ticket.type##']
@@ -377,6 +385,7 @@ class NotificationTargetTicket extends NotificationTargetCommonITILObject {
                   $tmp['##linkedticket.url##']
                                     = $this->formatURL($options['additionnaloption']['usertype'],
                                                        "ticket_".$row['tickets_id']);
+								   
 
                   $tmp['##linkedticket.title##']
                                     = $linkedticket->getField('name');
